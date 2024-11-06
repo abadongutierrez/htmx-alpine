@@ -1,0 +1,34 @@
+<table
+    id="contacts-table"
+    hx-get="/contacts"
+    hx-trigger="contacts-table-refresh from:body delay:200ms"
+    hx-select="#contacts-table"
+    hx-target="#contacts-table"
+    hx-swap="outerHTML transition:true"
+>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#contacts}}
+        <tr>
+            <td>{{name}}</td>
+            <td>{{email}}</td>
+            <td>
+                <button
+                    hx-delete="/api/contacts/{{id}}"
+                    hx-swap="none"
+                    hx-confirm="Are you sure?"
+                    class="delete-contact"
+                >
+                    Delete
+                </button>
+            </td>
+        </tr>
+        {{/contacts}}
+    </tbody>
+</table>

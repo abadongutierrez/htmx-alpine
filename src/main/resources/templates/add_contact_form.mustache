@@ -1,0 +1,52 @@
+<div x-data="addContactFormController();">
+    <h2>Add Contact</h2>
+    <div style="color: green"><span>Only domains @got.com are allowed</span></div>
+    <div x-show="isError" style="color: red"><span x-text="errorMessage"></span></div>
+    <form id="add-contact-form"
+          hx-post="/api/contacts"
+          hx-trigger="submit"
+          hx-swap="none"
+          hx-on:submit="Alpine.$data(this).submit();"
+          hx-on:htmx:after-request="Alpine.$data(this).afterRequest(event, this);"
+    >
+        <input type="text" name="name" placeholder="Name" required >
+        <input type="email" name="email" placeholder="Email" required>
+
+        <div x-show="isRequesting">Adding...</div>
+        <div x-show="!isRequesting"><button type="submit">Add</button></div>
+    </form>
+</div>
+
+<script>
+    function isError(xhr) {
+        return xhr && (xhr.status >= 400 || xhr.status >= 500);
+    }
+
+    function addContactFormController() {
+        return ({
+            isRequesting: false,
+            isError: false,
+            errorMessage: '',
+
+            init() {
+            },
+
+            submit() {
+                this.isRequesting = true;
+            },
+
+            afterRequest(event, form) {
+                this.isRequesting = false;
+                this.isError = isError(event.detail.xhr);
+                if (this.isError) this.handleError(event);
+                else form.reset();
+            },
+
+            handleError(event) {
+                const responseAsJson = JSON.parse(event.detail.xhr.response);
+                this.errorMessage = responseAsJson.error || 'An error occurred';
+                this.isError = true;
+            }
+        });
+    }
+</script>
